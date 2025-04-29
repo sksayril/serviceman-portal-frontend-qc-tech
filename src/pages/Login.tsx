@@ -17,7 +17,7 @@ const Login = () => {
     setError('');
 
     try {
-      const response = await fetch('http://localhost:3100/admin/api/serviceman/login', {
+      const response = await fetch('https://api.qc-tech.co.in/admin/api/serviceman/login', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

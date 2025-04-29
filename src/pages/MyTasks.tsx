@@ -42,7 +42,7 @@ const MyTasks = () => {
   useEffect(() => {
     const fetchTasks = async () => {
       try {
-        const response = await fetch('http://localhost:3100/admin/api/serviceman/my-tasks', {
+        const response = await fetch('https://api.qc-tech.co.in/admin/api/serviceman/my-tasks', {
           headers: {
             'Authorization': `Bearer ${token}`,
           },

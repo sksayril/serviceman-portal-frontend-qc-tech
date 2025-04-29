@@ -175,7 +175,7 @@ const Home = () => {
         form.append('images', file);
       });
   
-      const response = await fetch('http://localhost:3100/admin/api/serviceman/submit', {
+      const response = await fetch('https://api.qc-tech.co.in/admin/api/serviceman/submit', {
         method: 'POST',
         headers: {
           Authorization: `Bearer ${token}`,
