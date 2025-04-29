@@ -10,10 +10,12 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "jspdf": "^3.0.1",
     "lucide-react": "^0.344.0",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
-    "react-router-dom": "^6.22.3"
+    "react-router-dom": "^6.22.3",
+    "react-to-print": "^3.0.6"
   },
   "devDependencies": {
     "@eslint/js": "^9.9.1",

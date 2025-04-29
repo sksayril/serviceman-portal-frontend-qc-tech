@@ -228,8 +228,7 @@ const Home = () => {
             </p>
           </div>
           <p className="text-gray-600 text-center mb-8">
-            Thank you for your submission. Our team will process your request shortly.
-            You can track the status of your task using the ID above.
+            Thank you for your submission. Go Your My Task Section you will be check Your own Task
           </p>
           <div className="flex space-x-4">
             <button

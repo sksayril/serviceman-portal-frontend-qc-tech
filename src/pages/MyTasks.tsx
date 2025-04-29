@@ -1,6 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import { useAuth } from '../context/AuthContext';
-import { Loader2, Search, Calendar, Info, MessageSquare, Image as ImageIcon, Eye, Filter } from 'lucide-react';
+import { 
+  Loader2, Search, Calendar, Info, MessageSquare, 
+  Image, Eye, Filter, X, Clock, 
+  Phone, MapPin, User, Briefcase, Package, Wrench, Hash
+} from 'lucide-react';
 
 interface Task {
   _id: string;
@@ -10,6 +14,18 @@ interface Task {
   remarks: string;
   images: string[];
   createdAt: string;
+  machineName: string;
+  machineManufacturer: string;
+  machineSerialNumber: string;
+  machineModel: string;
+  contactPersonName: string;
+  contactPersonMobileNumber: string;
+  companyAddress: string;
+  ticketNumber: string;
+  customerDetails: string;
+  jobStartedDateTime: string;
+  jobClosedDateTime: string;
+  serviceManQcid: string;
 }
 
 const MyTasks = () => {
@@ -21,6 +37,7 @@ const MyTasks = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
   const [sortOrder, setSortOrder] = useState<'newest' | 'oldest'>('newest');
+  const [selectedTask, setSelectedTask] = useState<Task | null>(null);
 
   useEffect(() => {
     const fetchTasks = async () => {
@@ -76,6 +93,8 @@ const MyTasks = () => {
   };
 
   const formatDate = (dateString: string) => {
+    if (!dateString) return 'N/A';
+    
     const options: Intl.DateTimeFormatOptions = { 
       year: 'numeric', 
       month: 'short', 
@@ -86,9 +105,17 @@ const MyTasks = () => {
     return new Date(dateString).toLocaleString('en-US', options);
   };
 
+  const openTaskDetails = (task: Task) => {
+    setSelectedTask(task);
+  };
+
+  const closeTaskDetails = () => {
+    setSelectedTask(null);
+  };
+
   if (loading) {
     return (
-      <div className="flex flex-col items-center justify-center min-h-[400px] bg-white rounded-lg shadow-md p-8">
+      <div className="flex flex-col items-center justify-center min-h-screen bg-white rounded-lg shadow-md p-8">
         <Loader2 className="w-12 h-12 animate-spin text-blue-500 mb-4" />
         <p className="text-gray-600 font-medium">Loading your tasks...</p>
       </div>
@@ -112,7 +139,7 @@ const MyTasks = () => {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 p-4 max-w-7xl mx-auto">
       {/* Header with title and search */}
       <div className="bg-gradient-to-r from-blue-600 to-indigo-700 rounded-xl shadow-lg p-6">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
@@ -130,7 +157,7 @@ const MyTasks = () => {
               <Search className="absolute left-3 top-2.5 w-5 h-5 text-white text-opacity-70" />
             </div>
             
-            <div className="flex items-center gap-2 p-2 bg-white bg-opacity-20 border border-white border-opacity-30 rounded-lg">
+            {/* <div className="flex items-center gap-2 p-2 bg-white bg-opacity-20 border border-white border-opacity-30 rounded-lg">
               <Filter className="w-4 h-4 text-white" />
               <select 
                 value={sortOrder}
@@ -140,7 +167,7 @@ const MyTasks = () => {
                 <option value="newest" className="text-gray-900">Newest first</option>
                 <option value="oldest" className="text-gray-900">Oldest first</option>
               </select>
-            </div>
+            </div> */}
           </div>
         </div>
       </div>
@@ -168,7 +195,7 @@ const MyTasks = () => {
       {filteredTasks.length === 0 ? (
         <div className="bg-white rounded-lg shadow-md p-8 text-center">
           <div className="w-20 h-20 mx-auto bg-gray-100 rounded-full flex items-center justify-center mb-4">
-            <ImageIcon className="w-10 h-10 text-gray-400" />
+            <Image className="w-10 h-10 text-gray-400" />
           </div>
           <h3 className="text-xl font-semibold text-gray-700 mb-2">No tasks found</h3>
           <p className="text-gray-500">
@@ -178,68 +205,64 @@ const MyTasks = () => {
           </p>
         </div>
       ) : (
-        <div className="grid gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {filteredTasks.map((task) => (
             <div 
               key={task._id} 
-              className="bg-white rounded-lg shadow-lg overflow-hidden transition-all duration-300 hover:shadow-xl border border-gray-100 hover:border-blue-200"
+              className="bg-white rounded-lg shadow-lg overflow-hidden transition-all duration-300 hover:shadow-xl border border-gray-100 hover:border-blue-200 cursor-pointer"
+              onClick={() => openTaskDetails(task)}
             >
               <div className="p-6">
-                <div className="flex justify-between items-start mb-5">
+                <div className="flex justify-between items-start mb-4">
                   <div>
-                    <h3 className="text-xl font-semibold text-gray-900 mb-1">{task.organizationName}</h3>
-                    <div className="flex items-center text-gray-500 text-sm">
-                      <Calendar className="w-4 h-4 mr-1" />
-                      {formatDate(task.createdAt)}
+                    <h3 className="text-xl font-semibold text-gray-900 mb-1 line-clamp-1">{task.organizationName}</h3>
+                    <div className="flex items-center text-gray-500 text-sm space-x-3">
+                      <div className="flex items-center">
+                        <Calendar className="w-4 h-4 mr-1" />
+                        {formatDate(task.createdAt).split(',')[0]}
+                      </div>
+                      <div className="flex items-center">
+                        <User className="w-4 h-4 mr-1" />
+                        <span className="line-clamp-1">{task.contactPersonName}</span>
+                      </div>
                     </div>
                   </div>
-                  <span className="px-4 py-1.5 bg-blue-100 text-blue-800 rounded-full text-sm font-medium">
+                  <span className="px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm font-medium whitespace-nowrap">
                     {task.productName}
                   </span>
                 </div>
                 
-                <div className="space-y-5">
-                  <div className="bg-gray-50 rounded-lg p-4">
-                    <div className="flex items-center mb-2">
+                <div className="flex flex-wrap gap-2 mb-4">
+                  <div className="flex items-center bg-gray-100 rounded-full px-3 py-1 text-sm text-gray-600">
+                    <Package className="w-3 h-3 mr-1" />
+                    {task.machineName}
+                  </div>
+                  <div className="flex items-center bg-gray-100 rounded-full px-3 py-1 text-sm text-gray-600">
+                    <Wrench className="w-3 h-3 mr-1" />
+                    {task.machineManufacturer}
+                  </div>
+                  <div className="flex items-center bg-gray-100 rounded-full px-3 py-1 text-sm text-gray-600">
+                    <Hash className="w-3 h-3 mr-1" />
+                    {task.ticketNumber}
+                  </div>
+                </div>
+                
+                <div className="space-y-3">
+                  <div className="bg-gray-50 rounded-lg p-3">
+                    <div className="flex items-center mb-1">
                       <Info className="w-4 h-4 text-blue-600 mr-2" />
-                      <h4 className="text-sm font-medium text-gray-700">Additional Information</h4>
+                      <h4 className="text-sm font-medium text-gray-700">Info</h4>
                     </div>
-                    <p className="text-gray-700">{task.additionalInfo}</p>
+                    <p className="text-gray-700 text-sm line-clamp-2">{task.additionalInfo}</p>
                   </div>
                   
-                  <div className="bg-gray-50 rounded-lg p-4">
-                    <div className="flex items-center mb-2">
-                      <MessageSquare className="w-4 h-4 text-blue-600 mr-2" />
-                      <h4 className="text-sm font-medium text-gray-700">Remarks</h4>
-                    </div>
-                    <p className="text-gray-700">{task.remarks}</p>
-                  </div>
-                  
-                  <div>
-                    <div className="flex items-center mb-3">
-                      <ImageIcon className="w-4 h-4 text-blue-600 mr-2" />
-                      <h4 className="text-sm font-medium text-gray-700">
-                        Images ({task.images.length})
-                      </h4>
-                    </div>
-                    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
-                      {task.images.map((image, index) => (
-                        <div key={index} className="relative group">
-                          <img
-                            src={image}
-                            alt={`Task ${index + 1}`}
-                            className="w-full h-24 object-cover rounded-lg border border-gray-200 shadow-sm transition-all duration-300 hover:shadow-md cursor-pointer"
-                            onClick={() => setSelectedImage(image)}
-                          />
-                          <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-30 flex items-center justify-center transition-all duration-300 rounded-lg">
-                            <Eye className="w-6 h-6 text-white opacity-0 group-hover:opacity-100 transform scale-75 group-hover:scale-100 transition-all duration-300" />
-                          </div>
-                          <div className="absolute bottom-1 right-1 bg-black bg-opacity-60 text-white text-xs px-2 py-0.5 rounded">
-                            {index + 1}
-                          </div>
-                        </div>
-                      ))}
-                    </div>
+                  <div className="flex justify-between items-center mt-4">
+                    <span className="text-sm text-gray-500">
+                      {task.images.length} image{task.images.length !== 1 ? 's' : ''}
+                    </span>
+                    <button className="text-sm text-blue-600 hover:text-blue-800 font-medium">
+                      View Details
+                    </button>
                   </div>
                 </div>
               </div>
@@ -248,23 +271,202 @@ const MyTasks = () => {
         </div>
       )}
       
+      {/* Task Details Modal */}
+      {selectedTask && (
+        <div 
+          className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50 p-4 overflow-y-auto"
+          onClick={closeTaskDetails}
+        >
+          <div 
+            className="bg-white rounded-lg shadow-xl max-w-5xl w-full max-h-screen overflow-y-auto"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="sticky top-0 bg-white z-10 flex justify-between items-center p-6 border-b border-gray-200">
+              <h2 className="text-2xl font-bold text-gray-900">{selectedTask.organizationName}</h2>
+              <button 
+                className="text-gray-500 hover:text-gray-700"
+                onClick={closeTaskDetails}
+              >
+                <X className="w-6 h-6" />
+              </button>
+            </div>
+            
+            <div className="p-6 grid grid-cols-1 lg:grid-cols-3 gap-6">
+              {/* Left column - Main info */}
+              <div className="lg:col-span-2 space-y-6">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div className="bg-gray-50 rounded-lg p-4">
+                    <h3 className="text-lg font-semibold text-gray-900 mb-3">Machine Details</h3>
+                    <div className="space-y-2">
+                      <div className="flex items-start">
+                        <span className="w-32 text-gray-500">Name:</span>
+                        <span className="font-medium text-gray-900">{selectedTask.machineName}</span>
+                      </div>
+                      <div className="flex items-start">
+                        <span className="w-32 text-gray-500">Manufacturer:</span>
+                        <span className="font-medium text-gray-900">{selectedTask.machineManufacturer}</span>
+                      </div>
+                      <div className="flex items-start">
+                        <span className="w-32 text-gray-500">Model:</span>
+                        <span className="font-medium text-gray-900">{selectedTask.machineModel}</span>
+                      </div>
+                      <div className="flex items-start">
+                        <span className="w-32 text-gray-500">Serial Number:</span>
+                        <span className="font-medium text-gray-900">{selectedTask.machineSerialNumber}</span>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <div className="bg-gray-50 rounded-lg p-4">
+                    <h3 className="text-lg font-semibold text-gray-900 mb-3">Contact Details</h3>
+                    <div className="space-y-2">
+                      <div className="flex items-start">
+                        <span className="w-32 text-gray-500">Contact Person:</span>
+                        <span className="font-medium text-gray-900">{selectedTask.contactPersonName}</span>
+                      </div>
+                      <div className="flex items-start">
+                        <span className="w-32 text-gray-500">Phone:</span>
+                        <span className="font-medium text-gray-900">{selectedTask.contactPersonMobileNumber}</span>
+                      </div>
+                      <div className="flex items-start">
+                        <span className="w-32 text-gray-500">Address:</span>
+                        <span className="font-medium text-gray-900">{selectedTask.companyAddress}</span>
+                      </div>
+                      <div className="flex items-start">
+                        <span className="w-32 text-gray-500">Ticket Number:</span>
+                        <span className="font-medium text-gray-900">{selectedTask.ticketNumber}</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                
+                <div className="bg-gray-50 rounded-lg p-4">
+                  <h3 className="text-lg font-semibold text-gray-900 mb-3">Task Information</h3>
+                  <div className="space-y-4">
+                    <div>
+                      <div className="flex items-center mb-2">
+                        <Info className="w-4 h-4 text-blue-600 mr-2" />
+                        <h4 className="text-sm font-medium text-gray-700">Additional Information</h4>
+                      </div>
+                      <p className="text-gray-700 bg-white p-3 rounded border border-gray-200">{selectedTask.additionalInfo}</p>
+                    </div>
+                    
+                    <div>
+                      <div className="flex items-center mb-2">
+                        <MessageSquare className="w-4 h-4 text-blue-600 mr-2" />
+                        <h4 className="text-sm font-medium text-gray-700">Remarks</h4>
+                      </div>
+                      <p className="text-gray-700 bg-white p-3 rounded border border-gray-200">{selectedTask.remarks}</p>
+                    </div>
+                    
+                    <div>
+                      <div className="flex items-center mb-2">
+                        <User className="w-4 h-4 text-blue-600 mr-2" />
+                        <h4 className="text-sm font-medium text-gray-700">Customer Details</h4>
+                      </div>
+                      <p className="text-gray-700 bg-white p-3 rounded border border-gray-200">{selectedTask.customerDetails}</p>
+                    </div>
+                  </div>
+                </div>
+                
+                <div className="bg-gray-50 rounded-lg p-4">
+                  <h3 className="text-lg font-semibold text-gray-900 mb-3">Images</h3>
+                  <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                    {selectedTask.images.map((image, index) => (
+                      <div key={index} className="relative group">
+                        <img
+                          src={image}
+                          alt={`Task ${index + 1}`}
+                          className="w-full h-32 object-cover rounded-lg border border-gray-200 shadow-sm transition-all duration-300 hover:shadow-md cursor-pointer"
+                          onClick={() => setSelectedImage(image)}
+                        />
+                        <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-30 flex items-center justify-center transition-all duration-300 rounded-lg">
+                          <Eye className="w-6 h-6 text-white opacity-0 group-hover:opacity-100 transform scale-75 group-hover:scale-100 transition-all duration-300" />
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+              
+              {/* Right column - Dates and meta info */}
+              <div className="space-y-6">
+                <div className="bg-blue-50 rounded-lg p-4 border border-blue-100">
+                  <h3 className="text-lg font-semibold text-blue-900 mb-3">Task Status</h3>
+                  <div className="space-y-4">
+                    <div>
+                      <div className="flex items-center mb-2 text-blue-700">
+                        <Clock className="w-4 h-4 mr-2" />
+                        <h4 className="text-sm font-medium">Created</h4>
+                      </div>
+                      <p className="text-blue-800 bg-white p-2 rounded border border-blue-200">
+                        {formatDate(selectedTask.createdAt)}
+                      </p>
+                    </div>
+                    
+                    <div>
+                      <div className="flex items-center mb-2 text-blue-700">
+                        <Clock className="w-4 h-4 mr-2" />
+                        <h4 className="text-sm font-medium">Job Started</h4>
+                      </div>
+                      <p className="text-blue-800 bg-white p-2 rounded border border-blue-200">
+                        {formatDate(selectedTask.jobStartedDateTime)}
+                      </p>
+                    </div>
+                    
+                    <div>
+                      <div className="flex items-center mb-2 text-blue-700">
+                        <Clock className="w-4 h-4 mr-2" />
+                        <h4 className="text-sm font-medium">Job Closed</h4>
+                      </div>
+                      <p className="text-blue-800 bg-white p-2 rounded border border-blue-200">
+                        {formatDate(selectedTask.jobClosedDateTime)}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+                
+                <div className="bg-gray-50 rounded-lg p-4">
+                  <h3 className="text-lg font-semibold text-gray-900 mb-3">Technician Info</h3>
+                  <div className="space-y-2">
+                    <div className="flex items-start">
+                      <span className="w-24 text-gray-500">QC ID:</span>
+                      <span className="font-medium text-gray-900">{selectedTask.serviceManQcid}</span>
+                    </div>
+                    <div className="flex items-start">
+                      <span className="w-24 text-gray-500">Product:</span>
+                      <span className="font-medium text-blue-700 bg-blue-50 px-3 py-1 rounded-full text-sm">
+                        {selectedTask.productName}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+      
       {/* Image preview modal */}
       {selectedImage && (
         <div 
-          className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50 p-4"
+          className="fixed inset-0 bg-black bg-opacity-90 flex items-center justify-center z-50 p-4"
           onClick={() => setSelectedImage(null)}
         >
-          <div className="relative max-w-3xl max-h-[90vh]">
+          <div className="relative max-w-4xl max-h-screen">
             <button 
               className="absolute top-2 right-2 bg-black bg-opacity-60 text-white p-2 rounded-full hover:bg-opacity-80"
-              onClick={() => setSelectedImage(null)}
+              onClick={(e) => {
+                e.stopPropagation();
+                setSelectedImage(null);
+              }}
             >
               <X className="w-5 h-5" />
             </button>
             <img 
               src={selectedImage} 
               alt="Preview" 
-              className="max-w-full max-h-[90vh] object-contain rounded-lg"
+              className="max-w-full max-h-screen object-contain rounded-lg"
             />
           </div>
         </div>
